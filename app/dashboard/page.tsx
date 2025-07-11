@@ -61,7 +61,7 @@ export default function Dashboard() {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-900">EduTech Platform</h1>
-                <p className="text-sm text-gray-500">Student Dashboard</p>
+                <p className="text-sm text-gray-500">Catalogue</p>
               </div>
             </div>
             <Button

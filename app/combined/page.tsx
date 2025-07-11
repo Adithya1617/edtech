@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { addDays, format } from 'date-fns';
+import { format } from 'date-fns';
 import { ArrowLeft, BookOpen, Calendar as CalendarIcon, Clock, Plus, Target } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -20,7 +20,16 @@ interface MockTest {
 
 export default function CombinedPage() {
   const router = useRouter();
-  const [courseStartDate, setCourseStartDate] = useState<Date | undefined>(undefined);
+  // Update pre-fixed date options for course schedule (no time, batch format)
+  const courseDateTimeOptions = [
+    { label: 'Batch 1 July 1st to July 15th', value: '2024-07-01_to_2024-07-15' },
+    { label: 'Batch 2 July 16th to July 30th', value: '2024-07-16_to_2024-07-30' },
+    { label: 'Batch 3 August 1st to August 15th', value: '2024-08-01_to_2024-08-15' },
+    { label: 'Batch 4 August 16th to August 30th', value: '2024-08-16_to_2024-08-30' },
+    { label: 'Batch 5 September 1st to September 15th', value: '2024-09-01_to_2024-09-15' },
+  ];
+  // Replace courseDateTime with courseBatch and add courseTimeSlot
+  const [courseBatch, setCourseBatch] = useState<string>('');
   const [courseTimeSlot, setCourseTimeSlot] = useState<string>('');
   const [numberOfTests, setNumberOfTests] = useState<number>(1);
   const [mockTests, setMockTests] = useState<MockTest[]>([
@@ -71,13 +80,13 @@ export default function CombinedPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const isCourseValid = courseStartDate && courseTimeSlot;
+    const isCourseValid = courseBatch && courseTimeSlot;
     const areMocksValid = mockTests.every(test => test.date && test.timeSlot);
     
     if (isCourseValid && areMocksValid) {
       setLoading(true);
       const requestBody = {
-        course: { courseStartDate, courseTimeSlot },
+        course: { courseBatch, courseTimeSlot },
         mockTests
       };
       console.log('Submitting combined data:', requestBody);
@@ -144,7 +153,7 @@ export default function CombinedPage() {
                 <Plus className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Course + Mock Tests</h1>
+                <h1 className="text-xl font-bold text-gray-900">Full Course + Mocks</h1>
                 <p className="text-sm text-gray-500">Complete learning package</p>
               </div>
             </div>
@@ -166,11 +175,11 @@ export default function CombinedPage() {
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="course" className="flex items-center gap-2">
                 <BookOpen className="w-4 h-4" />
-                Course Schedule
+                Full Course
               </TabsTrigger>
               <TabsTrigger value="mock" className="flex items-center gap-2">
                 <Target className="w-4 h-4" />
-                Mock Tests
+                Mocks
               </TabsTrigger>
             </TabsList>
 
@@ -217,27 +226,19 @@ export default function CombinedPage() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Start Date Selection */}
                         <div className="space-y-2">
-                          <label className="text-sm font-medium text-gray-700">Course Start Date</label>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <Button
-                                variant="outline"
-                                className="w-full justify-start text-left font-normal h-12"
-                              >
-                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                {courseStartDate ? format(courseStartDate, 'PPP') : 'Select start date'}
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
-                              <Calendar
-                                mode="single"
-                                selected={courseStartDate}
-                                onSelect={setCourseStartDate}
-                                initialFocus
-                                disabled={(date) => date < new Date()}
-                              />
-                            </PopoverContent>
-                          </Popover>
+                          <label className="text-sm font-medium text-gray-700">Course Batch</label>
+                          <Select value={courseBatch} onValueChange={setCourseBatch}>
+                            <SelectTrigger className="h-12">
+                              <SelectValue placeholder="Choose batch" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {courseDateTimeOptions.map((option) => (
+                                <SelectItem key={option.value} value={option.value}>
+                                  {option.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </div>
 
                         {/* Time Slot Selection */}
@@ -262,15 +263,29 @@ export default function CombinedPage() {
                       </div>
 
                       {/* Course Schedule Preview */}
-                      {courseStartDate && courseTimeSlot && (
+                      {courseBatch && courseTimeSlot && (
                         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                           <h4 className="font-medium text-blue-900 mb-2">Course Schedule Preview</h4>
                           <div className="text-sm text-blue-800 space-y-1">
-                            <p><strong>Start Date:</strong> {format(courseStartDate, 'PPP')}</p>
-                            <p><strong>End Date:</strong> {format(addDays(courseStartDate, 14), 'PPP')}</p>
-                            <p><strong>Daily Time:</strong> {courseTimeSlot}</p>
+                            <p><strong>Batch:</strong> {courseDateTimeOptions.find(opt => opt.value === courseBatch)?.label}</p>
+                            <p><strong>Time Slot:</strong> {courseTimeSlot}</p>
                             <p><strong>Total Classes:</strong> 15 sessions</p>
                           </div>
+                        </div>
+                      )}
+                      {/* In the course schedule tab, after the preview, add a button to go to the mock tests tab */}
+                      {courseBatch && courseTimeSlot && (
+                        <div className="flex justify-center mt-6">
+                          <Button
+                            type="button"
+                            className="bg-gradient-to-r from-[#F6D365] to-[#FDA085] hover:from-[#F6D365]/90 hover:to-[#FDA085]/90 text-gray-900 font-medium px-8 py-3 text-lg shadow-md"
+                            onClick={() => {
+                              setStep('mock');
+                              setTabValue('mock');
+                            }}
+                          >
+                            Now Proceed to Mocks
+                          </Button>
                         </div>
                       )}
                     </CardContent>
@@ -285,25 +300,32 @@ export default function CombinedPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Target className="w-5 h-5 text-green-600" />
-                    Number of Mock Tests
+                    Number of Mocks
                   </CardTitle>
                   <CardDescription>
-                    Choose how many mock tests you want to schedule
+                    Choose how many mocks you want to schedule
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {[1, 2, 3, 4].map((num) => (
-                      <Button
-                        key={num}
-                        type="button"
-                        variant={numberOfTests === num ? "default" : "outline"}
-                        onClick={() => handleNumberOfTestsChange(num.toString())}
-                        className="h-16 text-lg font-medium"
-                      >
-                        {num} Test{num > 1 ? 's' : ''}
-                      </Button>
-                    ))}
+                    {[1, 2, 3, 4].map((num) => {
+                      const costs = { 1: '100£', 2: '170£', 3: '220£', 4: '300£' };
+                      return (
+                        <div key={num} className="flex flex-col items-center">
+                          <Button
+                            type="button"
+                            variant={numberOfTests === num ? "default" : "outline"}
+                            onClick={() => handleNumberOfTestsChange(num.toString())}
+                            className="h-16 text-lg font-medium w-full"
+                          >
+                            {num} Mock{num > 1 ? 's' : ''}
+                          </Button>
+                          <span className="mt-2 text-green-700 font-semibold text-base">
+                            {costs[num as 1 | 2 | 3 | 4]}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </CardContent>
               </Card>
@@ -315,12 +337,12 @@ export default function CombinedPage() {
                     <CardHeader>
                       <CardTitle className="flex items-center justify-between">
                         <span className="flex items-center gap-2">
-                          <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
-                            Test {index + 1}
-                          </Badge>
-                          Mock Test #{index + 1}
+                          Mock #{index + 1}
                         </span>
                       </CardTitle>
+                      <CardDescription>
+                        Schedule your mock date and time
+                      </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -331,7 +353,7 @@ export default function CombinedPage() {
                             <PopoverTrigger asChild>
                               <Button
                                 variant="outline"
-                                className="w-full justify-start text-left font-normal h-12"
+                                className="w-full justify-start text-left font-normal"
                               >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                 {test.date ? format(test.date, 'PPP') : 'Pick a date'}
@@ -356,7 +378,7 @@ export default function CombinedPage() {
                             value={test.timeSlot} 
                             onValueChange={(value) => updateMockTest(test.id, 'timeSlot', value)}
                           >
-                            <SelectTrigger className="h-12">
+                            <SelectTrigger>
                               <SelectValue placeholder="Choose time slot" />
                             </SelectTrigger>
                             <SelectContent>
@@ -376,33 +398,19 @@ export default function CombinedPage() {
                   </Card>
                 ))}
               </div>
+
+              {/* Submit Button */}
+              <div className="flex justify-center">
+                <Button
+                  type="submit"
+                  className="bg-gradient-to-r from-[#F8F6F2] to-[#EAE6DA] hover:from-[#F8F6F2]/90 hover:to-[#EAE6DA]/90 text-gray-900 font-medium px-8 py-3 text-lg shadow-md border border-[#e0dbce]"
+                  disabled={!mockTests.every(test => test.date && test.timeSlot) || loading}
+                >
+                  {loading ? 'Taking you there...' : 'Checkout'}
+                </Button>
+              </div>
             </TabsContent>
           </Tabs>
-
-          {/* Submit Button */}
-          <div className="flex justify-center">
-            {step === 'course' ? (
-              <Button
-                type="button"
-                className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-medium px-8 py-4 text-lg"
-                disabled={!courseStartDate || !courseTimeSlot}
-                onClick={() => {
-                  setStep('mock');
-                  setTabValue('mock');
-                }}
-              >
-                Select Mock Tests
-              </Button>
-            ) : (
-              <Button
-                type="submit"
-                className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-medium px-8 py-4 text-lg"
-                disabled={!mockTests.every(test => test.date && test.timeSlot) || loading}
-              >
-                {loading ? 'Submitting...' : 'Schedule Complete Package'}
-              </Button>
-            )}
-          </div>
         </form>
       </div>
     </div>
