@@ -244,7 +244,7 @@ export default function MockPage() {
               className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-medium px-8 py-3 text-lg"
               disabled={!mockTests.every(test => test.date && test.timeSlot) || loading}
             >
-              {loading ? 'Submitting...' : 'Schedule All Mock Tests'}
+              {loading ? 'Submitting...' : 'Schedule All Mocks'}
             </Button>
           </div>
         </form>

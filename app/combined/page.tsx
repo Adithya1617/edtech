@@ -28,6 +28,9 @@ export default function CombinedPage() {
   ]);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  // Add step and tabValue state
+  const [step, setStep] = useState<'course' | 'mock'>('course');
+  const [tabValue, setTabValue] = useState<'course' | 'mock'>('course');
 
   const timeSlots = [
     '09:00 AM - 11:00 AM',
@@ -152,7 +155,7 @@ export default function CombinedPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
-          <Tabs defaultValue="course" className="w-full">
+          <Tabs value={tabValue} onValueChange={v => setTabValue(v as 'course' | 'mock')} defaultValue="course" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="course" className="flex items-center gap-2">
                 <BookOpen className="w-4 h-4" />
@@ -371,13 +374,27 @@ export default function CombinedPage() {
 
           {/* Submit Button */}
           <div className="flex justify-center">
-            <Button
-              type="submit"
-              className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-medium px-8 py-4 text-lg"
-              disabled={!courseStartDate || !courseTimeSlot || !mockTests.every(test => test.date && test.timeSlot) || loading}
-            >
-              {loading ? 'Submitting...' : 'Schedule Complete Package'}
-            </Button>
+            {step === 'course' ? (
+              <Button
+                type="button"
+                className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-medium px-8 py-4 text-lg"
+                disabled={!courseStartDate || !courseTimeSlot}
+                onClick={() => {
+                  setStep('mock');
+                  setTabValue('mock');
+                }}
+              >
+                Select Mock Tests
+              </Button>
+            ) : (
+              <Button
+                type="submit"
+                className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-medium px-8 py-4 text-lg"
+                disabled={!mockTests.every(test => test.date && test.timeSlot) || loading}
+              >
+                {loading ? 'Submitting...' : 'Schedule Complete Package'}
+              </Button>
+            )}
           </div>
         </form>
       </div>

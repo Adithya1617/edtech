@@ -1,10 +1,9 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Clock, BookOpen, Target, Plus, ArrowRight, LogOut } from 'lucide-react';
+import { ArrowRight, BookOpen, LogOut, Plus, Target } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -16,7 +15,7 @@ export default function Dashboard() {
   const options = [
     {
       id: 'mock',
-      title: 'Mock Tests',
+      title: 'Mocks',
       description: 'Practice with timed mock tests to assess your knowledge and improve performance',
       icon: Target,
       features: ['Multiple test sessions', 'Flexible scheduling', 'Performance tracking'],
@@ -34,7 +33,7 @@ export default function Dashboard() {
     },
     {
       id: 'combined',
-      title: 'Course + Mock Tests',
+      title: 'Course + Mocks',
       description: 'Get the best of both worlds with comprehensive course plus practice tests',
       icon: Plus,
       features: ['Full course access', 'Mock test practice', 'Complete preparation'],

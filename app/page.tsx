@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { BookOpen, Shield, User } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function LoginPage() {
   const [role, setRole] = useState('');
@@ -60,7 +60,7 @@ export default function LoginPage() {
                   <SelectItem value="user">
                     <div className="flex items-center gap-2">
                       <User className="w-4 h-4" />
-                      Student
+                      User
                     </div>
                   </SelectItem>
                   <SelectItem value="admin">
