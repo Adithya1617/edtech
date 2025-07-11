@@ -12,6 +12,13 @@ export default function Dashboard() {
     router.push('/');
   };
 
+  // THEME COLORS
+  const THEME_COLORS = {
+    mock: 'from-[#F6D365] to-[#FDA085]', // soft gold to peach/cream
+    course: 'from-[#A8E063] to-[#F5F7FA]', // light teal to soft beige
+    combined: 'from-[#FAD0C4] to-[#FFD1FF]', // blush to pale gold
+  };
+
   const options = [
     {
       id: 'mock',
@@ -19,7 +26,7 @@ export default function Dashboard() {
       description: 'Practice with timed mock tests to assess your knowledge and improve performance',
       icon: Target,
       features: ['Multiple test sessions', 'Flexible scheduling', 'Performance tracking'],
-      color: 'from-green-500 to-emerald-600',
+      color: THEME_COLORS.mock,
       path: '/mock'
     },
     {
@@ -28,7 +35,7 @@ export default function Dashboard() {
       description: 'Complete 15-day intensive course with daily classes and structured learning',
       icon: BookOpen,
       features: ['15-day program', 'Daily classes', 'Structured curriculum'],
-      color: 'from-blue-500 to-indigo-600',
+      color: THEME_COLORS.course,
       path: '/course'
     },
     {
@@ -37,7 +44,7 @@ export default function Dashboard() {
       description: 'Get the best of both worlds with comprehensive course plus practice tests',
       icon: Plus,
       features: ['Full course access', 'Mock test practice', 'Complete preparation'],
-      color: 'from-purple-500 to-pink-600',
+      color: THEME_COLORS.combined,
       path: '/combined'
     }
   ];
@@ -109,7 +116,7 @@ export default function Dashboard() {
                   
                   <Button 
                     onClick={() => router.push(option.path)}
-                    className={`w-full bg-gradient-to-r ${option.color} hover:opacity-90 text-white font-medium py-3 transition-all duration-200 group-hover:scale-105`}
+                    className={`w-full bg-gradient-to-r ${option.color} hover:opacity-90 text-gray-900 font-medium py-3 transition-all duration-200 group-hover:scale-105`}
                   >
                     Get Started
                     <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />

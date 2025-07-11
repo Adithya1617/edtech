@@ -118,6 +118,13 @@ export default function CombinedPage() {
     );
   }
 
+  // THEME COLORS
+  const THEME_COLORS = {
+    mock: 'from-[#F6D365] to-[#FDA085]', // soft gold to peach/cream
+    course: 'from-[#A8E063] to-[#F5F7FA]', // light teal to soft beige
+    combined: 'from-[#FAD0C4] to-[#FFD1FF]', // blush to pale gold
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Header */}
@@ -133,7 +140,7 @@ export default function CombinedPage() {
               Back to Dashboard
             </Button>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
+              <div className={`w-10 h-10 bg-gradient-to-br ${THEME_COLORS.combined} rounded-xl flex items-center justify-center`}>
                 <Plus className="w-5 h-5 text-white" />
               </div>
               <div>

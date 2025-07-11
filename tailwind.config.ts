@@ -15,9 +15,9 @@ const config: Config = {
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
       borderRadius: {
-        lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
+        lg: '0.75rem',
+        md: '0.5rem',
+        sm: '0.375rem',
       },
       colors: {
         background: 'hsl(var(--background))',
@@ -60,6 +60,25 @@ const config: Config = {
           '4': 'hsl(var(--chart-4))',
           '5': 'hsl(var(--chart-5))',
         },
+        navy: {
+          DEFAULT: '#1a2746',
+          light: '#223366',
+          dark: '#10182b',
+        },
+        beige: {
+          DEFAULT: '#f8f6f2',
+          light: '#fcfbf7',
+          dark: '#eae6da',
+        },
+        gold: {
+          DEFAULT: '#e6b86a',
+          light: '#f3d9a4',
+          dark: '#b98a36',
+        },
+      },
+      fontFamily: {
+        sans: ["Lato", "ui-sans-serif", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", "Noto Sans", "sans-serif"],
+        serif: ["Playfair Display", "ui-serif", "Georgia", "Cambria", "Times New Roman", "Times", "serif"],
       },
       keyframes: {
         'accordion-down': {

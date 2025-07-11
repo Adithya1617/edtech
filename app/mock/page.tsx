@@ -1,6 +1,5 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,6 +16,11 @@ interface MockTest {
   date: Date | undefined;
   timeSlot: string;
 }
+
+// THEME COLORS
+const THEME_COLORS = {
+  mock: 'from-[#F6D365] to-[#FDA085]', // soft gold to peach/cream
+};
 
 export default function MockPage() {
   const router = useRouter();
@@ -87,13 +91,13 @@ export default function MockPage() {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Schedule Mock Tests</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Schedule Mocks</h2>
             <p className="text-gray-600">
-              Select the number of mock tests you want to take and schedule them according to your preference.
+              Select the number of mocks you want to take and schedule them according to your preference.
             </p>
           </div>
           <div className="mb-6">
-            <span className="text-green-700 bg-green-100 px-4 py-2 rounded font-semibold">Success! Your mock tests have been scheduled successfully. Redirecting to dashboard...</span>
+            <span className="text-green-700 bg-green-100 px-4 py-2 rounded font-semibold">Success! Your mocks have been scheduled successfully. Redirecting to dashboard...</span>
           </div>
         </div>
       </div>
@@ -115,12 +119,12 @@ export default function MockPage() {
               Back to Dashboard
             </Button>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
+              <div className={`w-10 h-10 bg-gradient-to-br ${THEME_COLORS.mock} rounded-xl flex items-center justify-center`}>
                 <Target className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Mock Tests</h1>
-                <p className="text-sm text-gray-500">Schedule your practice tests</p>
+                <h1 className="text-xl font-bold text-gray-900">Mocks</h1>
+                <p className="text-sm text-gray-500">Schedule your Mocks</p>
               </div>
             </div>
           </div>
@@ -130,9 +134,9 @@ export default function MockPage() {
       {/* Main Content */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Schedule Mock Tests</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Schedule Mocks</h2>
           <p className="text-gray-600">
-            Select the number of mock tests you want to take and schedule them according to your preference.
+            Select the number of mocks you want to take and schedule them according to your preference.
           </p>
         </div>
 
@@ -142,25 +146,32 @@ export default function MockPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Target className="w-5 h-5 text-green-600" />
-                Number of Mock Tests
+                Number of Mocks
               </CardTitle>
               <CardDescription>
-                Choose how many mock tests you want to schedule
+                Choose how many mocks you want to schedule
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[1, 2, 3, 4].map((num) => (
-                  <Button
-                    key={num}
-                    type="button"
-                    variant={numberOfTests === num ? "default" : "outline"}
-                    onClick={() => handleNumberOfTestsChange(num.toString())}
-                    className="h-16 text-lg font-medium"
-                  >
-                    {num} Test{num > 1 ? 's' : ''}
-                  </Button>
-                ))}
+                {[1, 2, 3, 4].map((num) => {
+                  const costs = { 1: '100£', 2: '170£', 3: '220£', 4: '300£' };
+                  return (
+                    <div key={num} className="flex flex-col items-center">
+                      <Button
+                        type="button"
+                        variant={numberOfTests === num ? "default" : "outline"}
+                        onClick={() => handleNumberOfTestsChange(num.toString())}
+                        className="h-16 text-lg font-medium w-full"
+                      >
+                        {num} Mock{num > 1 ? 's' : ''}
+                      </Button>
+                      <span className="mt-2 text-green-700 font-semibold text-base">
+                        {costs[num as 1 | 2 | 3 | 4]}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
@@ -172,14 +183,11 @@ export default function MockPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <span className="flex items-center gap-2">
-                      <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
-                        Test {index + 1}
-                      </Badge>
-                      Mock Test #{index + 1}
+                      Mock #{index + 1}
                     </span>
                   </CardTitle>
                   <CardDescription>
-                    Schedule your mock test date and time
+                    Schedule your mock date and time
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -241,10 +249,10 @@ export default function MockPage() {
           <div className="flex justify-center">
             <Button
               type="submit"
-              className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-medium px-8 py-3 text-lg"
+              className="bg-gradient-to-r from-[#F8F6F2] to-[#EAE6DA] hover:from-[#F8F6F2]/90 hover:to-[#EAE6DA]/90 text-gray-900 font-medium px-8 py-3 text-lg shadow-md border border-[#e0dbce]"
               disabled={!mockTests.every(test => test.date && test.timeSlot) || loading}
             >
-              {loading ? 'Submitting...' : 'Schedule All Mocks'}
+              {loading ? 'Taking you there...' : 'Checkout'}
             </Button>
           </div>
         </form>

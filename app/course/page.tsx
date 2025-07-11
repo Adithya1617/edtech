@@ -11,6 +11,11 @@ import { ArrowLeft, BookOpen, Calendar as CalendarIcon, Clock } from 'lucide-rea
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
+// THEME COLORS
+const THEME_COLORS = {
+  course: 'from-[#A8E063] to-[#F5F7FA]', // light teal to soft beige
+};
+
 export default function CoursePage() {
   const router = useRouter();
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
@@ -85,7 +90,7 @@ export default function CoursePage() {
               Back to Dashboard
             </Button>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
+              <div className={`w-10 h-10 bg-gradient-to-br ${THEME_COLORS.course} rounded-xl flex items-center justify-center`}>
                 <BookOpen className="w-5 h-5 text-white" />
               </div>
               <div>
