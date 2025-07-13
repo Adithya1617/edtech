@@ -85,7 +85,7 @@ export default function MockPage() {
 
   if (submitted) {
     setTimeout(() => {
-      router.push('/dashboard');
+      router.push('/selection');
     }, 2000);
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
@@ -112,11 +112,11 @@ export default function MockPage() {
           <div className="flex items-center gap-4 h-16">
             <Button
               variant="ghost"
-              onClick={() => router.push('/dashboard')}
+              onClick={() => router.push('/selection')}
               className="flex items-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
-              Back to Dashboard
+              Back to Selection
             </Button>
             <div className="flex items-center gap-3">
               <div className={`w-10 h-10 bg-gradient-to-br ${THEME_COLORS.mock} rounded-xl flex items-center justify-center`}>
