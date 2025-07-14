@@ -10,6 +10,7 @@ import { format } from 'date-fns';
 import { ArrowLeft, Calendar as CalendarIcon, Clock, Target } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useSelection } from '../SelectionContext';
 
 interface MockTest {
   id: string;
@@ -24,6 +25,7 @@ const THEME_COLORS = {
 
 export default function MockPage() {
   const router = useRouter();
+  const { setSelection } = useSelection();
   const [numberOfTests, setNumberOfTests] = useState<number>(1);
   const [mockTests, setMockTests] = useState<MockTest[]>([
     { id: '1', date: undefined, timeSlot: '' }
@@ -62,24 +64,22 @@ export default function MockPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const isValid = mockTests.every(test => test.date && test.timeSlot);
-    
     if (isValid) {
-      setLoading(true);
-      const requestBody = { mockTests };
-      console.log('Submitting mock test data:', requestBody);
-      try {
-        await fetch('https://jsonplaceholder.typicode.com/posts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(requestBody),
-        });
-        setSubmitted(true);
-        // Removed redirect to dashboard
-      } catch (error) {
-        alert('Failed to submit. Please try again.');
-      } finally {
-        setLoading(false);
-      }
+      // Assign prices based on number of tests
+      const priceMap = { 1: 100, 2: 85, 3: 73.33, 4: 75 };
+      const totalPrices = { 1: 100, 2: 170, 3: 220, 4: 300 };
+      const perTest = priceMap[numberOfTests as 1 | 2 | 3 | 4] || 100;
+      const testsWithPrice = mockTests.map((test, idx) => ({
+        ...test,
+        date: test.date ? test.date.toISOString() : '',
+        price: numberOfTests === 3 ? (idx === 2 ? 74 : 73) : perTest
+      }));
+      setSelection({
+        type: 'mock',
+        mockTests: testsWithPrice,
+      });
+      router.push('/checkout');
+      return;
     }
   };
 

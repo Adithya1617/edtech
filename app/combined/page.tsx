@@ -11,6 +11,7 @@ import { format } from 'date-fns';
 import { ArrowLeft, BookOpen, Calendar as CalendarIcon, Clock, Plus, Target } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useSelection } from '../SelectionContext';
 
 interface MockTest {
   id: string;
@@ -20,6 +21,7 @@ interface MockTest {
 
 export default function CombinedPage() {
   const router = useRouter();
+  const { setSelection } = useSelection();
   // Update pre-fixed date options for course schedule (no time, batch format)
   const courseDateTimeOptions = [
     { label: 'Batch 1 July 1st to July 15th', value: '2024-07-01_to_2024-07-15' },
@@ -82,27 +84,27 @@ export default function CombinedPage() {
     e.preventDefault();
     const isCourseValid = courseBatch && courseTimeSlot;
     const areMocksValid = mockTests.every(test => test.date && test.timeSlot);
-    
     if (isCourseValid && areMocksValid) {
-      setLoading(true);
-      const requestBody = {
-        course: { courseBatch, courseTimeSlot },
-        mockTests
-      };
-      console.log('Submitting combined data:', requestBody);
-      try {
-        await fetch('https://jsonplaceholder.typicode.com/posts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(requestBody),
-        });
-        setSubmitted(true);
-        // Removed redirect to dashboard
-      } catch (error) {
-        alert('Failed to submit. Please try again.');
-      } finally {
-        setLoading(false);
-      }
+      // Assign prices for course and mocks
+      const coursePrice = 2000;
+      const priceMap = { 1: 100, 2: 85, 3: 73.33, 4: 75 };
+      const perTest = priceMap[numberOfTests as 1 | 2 | 3 | 4] || 100;
+      const testsWithPrice = mockTests.map((test, idx) => ({
+        ...test,
+        date: test.date ? test.date.toISOString() : '',
+        price: numberOfTests === 3 ? (idx === 2 ? 74 : 73) : perTest
+      }));
+      setSelection({
+        type: 'combined',
+        course: {
+          startDate: courseBatch.split('_to_')[0],
+          timeSlot: courseTimeSlot,
+          price: 250,
+        },
+        mockTests: testsWithPrice,
+      });
+      router.push('/checkout');
+      return;
     }
   };
 
@@ -207,6 +209,10 @@ export default function CombinedPage() {
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-medium text-gray-600">Class Duration</span>
                           <Badge variant="outline" className="bg-purple-100 text-purple-800">2 Hours</Badge>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium text-gray-600">Price</span>
+                          <Badge variant="outline" className="bg-yellow-100 text-yellow-800">€250</Badge>
                         </div>
                       </div>
                     </CardContent>

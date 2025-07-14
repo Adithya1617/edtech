@@ -10,6 +10,7 @@ import { addDays, format } from 'date-fns';
 import { ArrowLeft, BookOpen, Calendar as CalendarIcon, Clock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useSelection } from '../SelectionContext';
 
 // THEME COLORS
 const THEME_COLORS = {
@@ -18,6 +19,7 @@ const THEME_COLORS = {
 
 export default function CoursePage() {
   const router = useRouter();
+  const { setSelection } = useSelection();
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [timeSlot, setTimeSlot] = useState<string>('');
   const [submitted, setSubmitted] = useState(false);
@@ -35,22 +37,14 @@ export default function CoursePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (startDate && timeSlot) {
-      setLoading(true);
-      const requestBody = { startDate, timeSlot };
-      console.log('Submitting course data:', requestBody);
-      try {
-        await fetch('https://jsonplaceholder.typicode.com/posts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(requestBody),
-        });
-        setSubmitted(true);
-        // Removed redirect to dashboard
-      } catch (error) {
-        alert('Failed to submit. Please try again.');
-      } finally {
-        setLoading(false);
-      }
+      setSelection({
+        type: 'course',
+        startDate: startDate.toISOString(),
+        timeSlot,
+        price: 250,
+      });
+      router.push('/checkout');
+      return;
     }
   };
 
@@ -134,6 +128,10 @@ export default function CoursePage() {
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-gray-600">Class Duration</span>
                     <Badge variant="outline" className="bg-purple-100 text-purple-800">2 Hours</Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-600">Price</span>
+                    <Badge variant="outline" className="bg-yellow-100 text-yellow-800">€250</Badge>
                   </div>
                 </div>
                 

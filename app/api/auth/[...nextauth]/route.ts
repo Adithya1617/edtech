@@ -24,9 +24,9 @@ const handler = NextAuth({
       return session;
     },
     async redirect({ url, baseUrl }) {
-      // Redirect to selection page after successful login
+      // Just return the baseUrl ("/") so the client can handle the redirect
       if (url.startsWith(baseUrl)) {
-        return `${baseUrl}/selection`;
+        return baseUrl;
       }
       return url;
     },

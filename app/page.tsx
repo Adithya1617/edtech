@@ -6,10 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { BookOpen, Github, Shield, User } from 'lucide-react';
+import { BookOpen, Shield, User } from 'lucide-react';
 import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function LoginPage() {
   const [role, setRole] = useState('');
@@ -20,10 +20,40 @@ export default function LoginPage() {
   const router = useRouter();
   const { data: session } = useSession();
 
-  // Redirect if already logged in
+  // Redirect if already logged in (client-side only)
+  // useEffect(() => {
+  //   if (session) {
+  //     router.push('/selection');
+  //   }
+  // }, [session, router]);
+
+  // Helper to get cookie value by name
+  function getCookie(name: string) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(';').shift();
+  }
+
+  // After OAuth login, redirect based on stored role (from cookie)
+  useEffect(() => {
+    if (session) {
+      if (typeof window !== 'undefined') {
+        const storedRole = getCookie('loginRole');
+        if (storedRole === 'admin') {
+          router.push('/admin');
+        } else {
+          router.push('/selection');
+        }
+        // Clear the cookie
+        document.cookie = 'loginRole=; Max-Age=0; path=/';
+      }
+    }
+  }, [session, router]);
+
+  // Always call all hooks before returning
   if (session) {
-    router.push('/selection');
-    return null;
+    // Optionally, show a spinner or just an empty div while redirecting
+    return <div />;
   }
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -44,16 +74,15 @@ export default function LoginPage() {
   const handleOAuthLogin = async (provider: string) => {
     setOauthLoading(true);
     try {
-      const result = await signIn(provider, {
-        callbackUrl: '/selection',
-        redirect: false,
-      });
-      
-      if (result?.ok) {
-        router.push('/selection');
-      } else {
-        console.error('OAuth login failed:', result?.error);
+      // Store the selected role in a cookie (works across OAuth redirects)
+      if (typeof window !== 'undefined') {
+        document.cookie = `loginRole=${role}; path=/`;
       }
+      const result = await signIn(provider, {
+        callbackUrl: '/', // Always return to root, handle redirect after
+        redirect: true,
+      });
+      // No need to handle redirect here, will be handled in useEffect below
     } catch (error) {
       console.error('OAuth error:', error);
     } finally {
@@ -86,7 +115,7 @@ export default function LoginPage() {
               variant="outline"
               className="w-full"
               onClick={() => handleOAuthLogin('google')}
-              disabled={oauthLoading}
+              disabled={oauthLoading || !role}
             >
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                 <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -95,17 +124,6 @@ export default function LoginPage() {
                 <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
               </svg>
               {oauthLoading ? 'Signing in...' : 'Continue with Google'}
-            </Button>
-            
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full"
-              onClick={() => handleOAuthLogin('github')}
-              disabled={oauthLoading}
-            >
-              <Github className="w-5 h-5 mr-2" />
-              {oauthLoading ? 'Signing in...' : 'Continue with GitHub'}
             </Button>
           </div>
 
