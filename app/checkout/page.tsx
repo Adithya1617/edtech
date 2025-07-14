@@ -83,10 +83,10 @@ export default function CheckoutPage() {
     );
   }
 
-  const handleStripe = () => {
-    // TODO: Integrate Stripe payment
-    alert('Proceeding to Stripe payment portal...');
-    // clearSelection(); // Uncomment if you want to clear after payment
+  const handleStripe = async () => {
+    const res = await fetch('/api/create-checkout-session', { method: 'POST' });
+    const data = await res.json();
+    window.location.href = data.url;
   };
 
   return (
