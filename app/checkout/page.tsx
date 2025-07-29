@@ -7,12 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelection } from '../SelectionContext';
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { selection, clearSelection } = useSelection();
+  const [stripeError, setStripeError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!selection) {
@@ -84,7 +85,7 @@ export default function CheckoutPage() {
   }
 
   const handleStripe = async () => {
-    // Calculate the total amount in cents (Stripe expects the amount in the smallest currency unit)
+    setStripeError(null);
     let amount = 0;
     if (selection.type === 'course') {
       amount = Math.round(selection.price * 100);
@@ -93,17 +94,25 @@ export default function CheckoutPage() {
     } else if (selection.type === 'combined') {
       amount = Math.round(selection.course.price * 100) + selection.mockTests.reduce((sum, t) => sum + Math.round(t.price * 100), 0);
     }
-
-    const res = await fetch('https://stripe-integration-dwsk.onrender.com/create-checkout-session', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount }),
-    });
-    const data = await res.json();
-    if (data.url) {
-      window.location.href = data.url;
-    } else {
-      alert(data.error || 'Failed to create Stripe session');
+    try {
+      const res = await fetch('https://stripe-integration-dwsk.onrender.com/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount }),
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        setStripeError(errorData.error || 'Failed to create Stripe session. Please try again later.');
+        return;
+      }
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        setStripeError(data.error || 'Failed to create Stripe session. Please try again later.');
+      }
+    } catch (err: any) {
+      setStripeError('Unable to connect to payment server. Please check your internet connection or try again later.');
     }
   };
 
@@ -139,6 +148,11 @@ export default function CheckoutPage() {
           <Button className="w-full mt-4 bg-gradient-to-r from-gold to-accent text-white text-lg py-3 shadow-lg hover:scale-105 hover:shadow-2xl transition-transform duration-200" onClick={handleStripe}>
             Proceed to Stripe Payment
           </Button>
+          {stripeError && (
+            <div className="mt-4 text-red-600 text-center font-semibold bg-red-50 border border-red-200 rounded p-2">
+              {stripeError}
+            </div>
+          )}
         </CardContent>
       </Card>
       <style jsx global>{`
