@@ -84,9 +84,27 @@ export default function CheckoutPage() {
   }
 
   const handleStripe = async () => {
-    const res = await fetch('/api/create-checkout-session', { method: 'POST' });
+    // Calculate the total amount in cents (Stripe expects the amount in the smallest currency unit)
+    let amount = 0;
+    if (selection.type === 'course') {
+      amount = Math.round(selection.price * 100);
+    } else if (selection.type === 'mock') {
+      amount = selection.mockTests.reduce((sum, t) => sum + Math.round(t.price * 100), 0);
+    } else if (selection.type === 'combined') {
+      amount = Math.round(selection.course.price * 100) + selection.mockTests.reduce((sum, t) => sum + Math.round(t.price * 100), 0);
+    }
+
+    const res = await fetch('https://stripe-integration-dwsk.onrender.com/create-checkout-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount }),
+    });
     const data = await res.json();
-    window.location.href = data.url;
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert(data.error || 'Failed to create Stripe session');
+    }
   };
 
   return (

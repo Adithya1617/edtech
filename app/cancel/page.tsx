@@ -1,21 +1,19 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 
-export default function SuccessPage() {
+export default function CancelPage() {
   const router = useRouter();
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      router.push('/selection');
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, [router]);
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
       <div className="w-full max-w-xl bg-white/90 shadow-2xl border-0 animate-fade-in-up flex flex-col items-center justify-center p-8">
-        <h1 className="text-4xl font-bold text-green-600 mb-4">Payment Successful!</h1>
-        <p className="text-lg text-gray-700 mb-2">Thank you for your purchase. Your payment was processed successfully.</p>
-        <p className="text-gray-500">Redirecting you to the selection page...</p>
+        <h1 className="text-4xl font-bold text-yellow-600 mb-4">Payment Cancelled</h1>
+        <p className="text-lg text-gray-700 mb-2">Your payment was cancelled. No charges were made.</p>
+        <button
+          className="mt-4 px-6 py-2 bg-accent text-white rounded-lg shadow hover:scale-105 transition-transform duration-200"
+          onClick={() => router.push('/selection')}
+        >
+          Return to Selection
+        </button>
       </div>
       <style jsx global>{`
         .animate-fade-in-up {
@@ -34,4 +32,4 @@ export default function SuccessPage() {
       `}</style>
     </div>
   );
-}
+} 
