@@ -2,11 +2,18 @@
 
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
-import { signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 export function LogoutButton() {
+  const router = useRouter();
+
   const handleLogout = () => {
-    signOut({ callbackUrl: '/' });
+    // Clear authentication data
+    localStorage.removeItem('token');
+    localStorage.removeItem('userRole');
+    
+    // Redirect to login page
+    router.push('/');
   };
 
   return (

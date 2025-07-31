@@ -1,8 +1,7 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -10,25 +9,37 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
-  const { data: session, status } = useSession();
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    if (status === 'loading') return;
+    const checkAuth = () => {
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        setIsAuthenticated(false);
+        router.push('/');
+        return;
+      }
 
-    if (!session) {
-      router.push('/');
-      return;
-    }
+      // You can decode the JWT token here to get user info and role
+      // For now, we'll assume the role is stored separately or in the token
+      const role = localStorage.getItem('userRole');
+      setUserRole(role);
+      setIsAuthenticated(true);
 
-    // Add role-based protection here if needed
-    if (requiredRole === 'admin') {
-      // Check if user has admin role
-      // This would depend on your user data structure
-    }
-  }, [session, status, router, requiredRole]);
+      // Add role-based protection
+      if (requiredRole === 'admin' && role !== 'admin') {
+        router.push('/selection');
+        return;
+      }
+    };
 
-  if (status === 'loading') {
+    checkAuth();
+  }, [router, requiredRole]);
+
+  if (isAuthenticated === null) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
@@ -36,7 +47,7 @@ export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) 
     );
   }
 
-  if (!session) {
+  if (!isAuthenticated) {
     return null;
   }
 
