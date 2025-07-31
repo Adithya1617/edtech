@@ -11,8 +11,8 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const router = useRouter();
 
-  // TODO: Replace with your deployed backend endpoint
-  const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://127.0.0.1:5000'
+  // Use deployed backend endpoint
+  const BACKEND_URL = 'https://oauth-7efr.onrender.com';
 
   // Handle redirect after OAuth login (the backend redirects directly to /admin or /selection)
   // No need to handle token/role in query params, as backend manages session and redirects
@@ -24,7 +24,7 @@ export default function LoginPage() {
 
   // Microsoft OAuth login handler
   const handleMicrosoftOAuth = () => {
-    window.location.href = 'http://127.0.0.1:5000/login-microsoft';
+    window.location.href = `${BACKEND_URL}/login-microsoft`;
   };
 
   return (
