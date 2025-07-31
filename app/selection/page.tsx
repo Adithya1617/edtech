@@ -3,40 +3,26 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, BookOpen, LogOut, Plus, Target } from 'lucide-react';
-import { signOut, useSession } from 'next-auth/react';
+// ...existing code...
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 export default function SelectionPage() {
   const router = useRouter();
-  const { data: session, status } = useSession();
 
-  // Redirect to login if not authenticated
+  // Redirect to login if not authenticated (replace with your own auth logic)
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    // Example: check for a token in localStorage
+    const token = localStorage.getItem('token');
+    if (!token) {
       router.push('/');
     }
-  }, [status, router]);
+  }, [router]);
 
-  // Show loading while checking authentication
-  if (status === 'loading') {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Don't render if not authenticated
-  if (!session) {
-    return null;
-  }
-
-  const handleLogout = async () => {
-    await signOut({ callbackUrl: '/' });
+  const handleLogout = () => {
+    // Clear local/session storage and redirect to login
+    localStorage.clear();
+    router.push('/');
   };
 
   // THEME COLORS
