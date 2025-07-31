@@ -11,8 +11,8 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const router = useRouter();
 
-  // Use deployed backend endpoint
-  const BACKEND_URL = 'https://oauth-7efr.onrender.com';
+  // Use backend endpoint from environment variable
+  const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   // Handle redirect after OAuth login (the backend redirects directly to /admin or /selection)
   // No need to handle token/role in query params, as backend manages session and redirects
