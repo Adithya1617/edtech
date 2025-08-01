@@ -1,7 +1,8 @@
 'use client';
 
+import { useAuth } from '@/AuthContext';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -9,47 +10,41 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const [userRole, setUserRole] = useState<string | null>(null);
+  const { isAuthenticated, isLoading, user } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    const checkAuth = () => {
-      const token = localStorage.getItem('token');
-      
-      if (!token) {
-        setIsAuthenticated(false);
-        router.push('/');
-        return;
-      }
+    if (isLoading) {
+      return; // Wait until authentication status is resolved
+    }
+    if (!isAuthenticated) {
+      router.push('/');
+      return;
+    }
 
-      // You can decode the JWT token here to get user info and role
-      // For now, we'll assume the role is stored separately or in the token
-      const role = localStorage.getItem('userRole');
-      setUserRole(role);
-      setIsAuthenticated(true);
-
-      // Add role-based protection
-      if (requiredRole === 'admin' && role !== 'admin') {
+    if (requiredRole && user?.role !== requiredRole) {
+      // If a role is required and the user doesn't have it, redirect to their default page
+      if (user?.role === 'admin') {
+        router.push('/admin');
+      } else {
         router.push('/selection');
-        return;
       }
-    };
+    }
+  }, [isLoading, isAuthenticated, user, requiredRole, router]);
 
-    checkAuth();
-  }, [router, requiredRole]);
-
-  if (isAuthenticated === null) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-primary"></div>
       </div>
     );
   }
 
-  if (!isAuthenticated) {
-    return null;
+  // Only render children if authenticated and the role check passes.
+  if (isAuthenticated && (!requiredRole || user?.role === requiredRole)) {
+    return <>{children}</>;
   }
 
-  return <>{children}</>;
+  // Render nothing while redirecting.
+  return null;
 } 

@@ -3,16 +3,14 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, BookOpen, LogOut, Plus, Target } from 'lucide-react';
-// ...existing code...
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 export default function SelectionPage() {
   const router = useRouter();
 
-  // Redirect to login if not authenticated (replace with your own auth logic)
+  // Redirect to login if not authenticated (check for token in localStorage)
   useEffect(() => {
-    // Example: check for a token in localStorage
     const token = localStorage.getItem('token');
     if (!token) {
       router.push('/');
@@ -20,7 +18,6 @@ export default function SelectionPage() {
   }, [router]);
 
   const handleLogout = () => {
-    // Clear local/session storage and redirect to login
     localStorage.clear();
     router.push('/');
   };

@@ -1,19 +1,14 @@
 'use client';
 
+import { useAuth } from '@/AuthContext';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 
 export function LogoutButton() {
-  const router = useRouter();
+  const { logout } = useAuth();
 
   const handleLogout = () => {
-    // Clear authentication data
-    localStorage.removeItem('token');
-    localStorage.removeItem('userRole');
-    
-    // Redirect to login page
-    router.push('/');
+    logout(); // This will redirect to the backend's /logout endpoint
   };
 
   return (

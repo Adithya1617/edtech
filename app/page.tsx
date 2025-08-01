@@ -19,12 +19,12 @@ export default function LoginPage() {
 
   // Google OAuth login handler
   const handleGoogleOAuth = () => {
-    window.location.href = `${BACKEND_URL}/login`;
+    window.location.href = `${BACKEND_URL}/login/google`;
   };
 
   // Microsoft OAuth login handler
   const handleMicrosoftOAuth = () => {
-    window.location.href = `${BACKEND_URL}/login-microsoft`;
+    window.location.href = `${BACKEND_URL}/login/microsoft`;
   };
 
   return (
